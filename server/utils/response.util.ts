@@ -1,6 +1,6 @@
-import type { ResponseArray } from '~/server/types/response';
+import type { ResponseArray } from '~/types/response';
 
-export function responseSuccess<T>(data: T | T[], message = 'Success', status = true, code = 200): ResponseArray<T> {
+export function responseSuccess<T>(data: T, message = 'Success', status = true, code = 200): ResponseArray<T> {
   return {
     code,
     status,

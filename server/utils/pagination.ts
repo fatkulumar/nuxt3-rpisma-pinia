@@ -1,20 +1,5 @@
 import { H3Event, getQuery } from 'h3';
-
-interface PaginationMeta {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-  from: number;
-  to: number;
-}
-
-interface PaginationLinks {
-  first: string;
-  last: string;
-  next: string | null;
-  prev: string | null;
-}
+import { PaginationMeta, PaginationLinks } from '~/types/pagination';
 
 export function getPagination(event: H3Event): { page: number; limit: number } {
   const query = getQuery(event);
@@ -30,7 +15,7 @@ export function makePaginationMeta(
   limit: number
 ): { meta: PaginationMeta; links: PaginationLinks } {
   const lastPage = Math.ceil(total / limit);
-  const from = total === 0 ? 0 : (page - 1) * limit + 1;
+  const from = total === 0 ? 0 : (page - 1) * limit + 1; 
   const to = Math.min(page * limit, total);
 
   const pathname = event.path || '/';

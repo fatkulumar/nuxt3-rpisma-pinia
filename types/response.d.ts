@@ -9,5 +9,5 @@ export interface ResponseArray<T> {
   code: number;
   status: boolean;
   message: string;
-  data: T | T[];
-}
+  data: T;
+} 

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { Pagination } from '~/types/pagination';
-import type { ApiResponse } from '~/types/apiResponse';
+import type { ResponseArray } from '~/types/response';
 import type { User } from '~/types/user';
 
 export const useUserStore = defineStore('userStore', {
@@ -15,7 +15,7 @@ export const useUserStore = defineStore('userStore', {
             this.isLoading = true;
             this.error = null;
             try {
-                const res = await $fetch<ApiResponse<Pagination<User>>>('/api/admin/user');
+                const res = await $fetch<ResponseArray<Pagination<User>>>('/api/admin/user');
                 this.users = res.data;
             } catch (err: any) {
                 this.error = err?.data?.message || err.message || 'Gagal memuat data';
