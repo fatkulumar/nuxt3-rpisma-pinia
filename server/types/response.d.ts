@@ -1,4 +1,3 @@
-// types/response.ts
 export interface ResponseSingle<T> {
   code: number;
   status: boolean;
