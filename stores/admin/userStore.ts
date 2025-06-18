@@ -1,27 +1,29 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import type { Pagination } from '~/types/pagination';
-import type { ResponseArray } from '~/types/response';
-import type { User } from '~/types/user';
+import type { Pagination } from "~/types/pagination";
+import type { ResponseArray } from "~/types/response";
+import type { User } from "~/types/user";
 
-export const useUserStore = defineStore('userStore', {
-    state: () => ({
-        users: ref<Pagination<User> | null>(null),
-        isLoading: ref(false),
-        error: ref<string | null>(null),
-    }),
-    actions: {
-        async getUsers() {
-            this.isLoading = true;
-            this.error = null;
-            try {
-                const res = await $fetch<ResponseArray<Pagination<User>>>('/api/admin/user');
-                this.users = res.data;
-            } catch (err: any) {
-                this.error = err?.data?.message || err.message || 'Gagal memuat data';
-            } finally {
-                this.isLoading = false;
-            }
-        }
+export const useUserStore = defineStore('userStore', () => {
+  const users = ref<Pagination<User> | null>(null);
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
+
+  const getUsers = async () => {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const res = await $fetch<ResponseArray<Pagination<User>>>('/api/admin/user');
+      users.value = res.data;
+    } catch (err: any) {
+      error.value = err.message;
+    } finally {
+      isLoading.value = false;
     }
+  };
+
+  return {
+    users,
+    isLoading,
+    error,
+    getUsers,
+  };
 });
