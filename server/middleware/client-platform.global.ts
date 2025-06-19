@@ -19,7 +19,7 @@ export default defineEventHandler((event) => {
     //   statusCode: 400,
     //   statusMessage: `Header 'client-platform' harus salah satu dari: ${allowedPlatforms.join(', ')}`,
     // })
-      return responseError(platform, `Header 'client-platform' harus salah satu dari: ${allowedPlatforms.join(', ')}`, false, 400)
+    return responseError(platform, `Platform '${platform}' tidak diizinkan.`, false, 400)
   }
 
   // Simpan ke context agar bisa diakses di controller

@@ -23,7 +23,14 @@ export const useUserStore = defineStore('userStore', {
       this.error = null;
 
       try {
-        const res = await $fetch<ResponseArray<Pagination<User>>>(`/api/admin/user?page=${page}`);
+        const res = await useClientFetchWithValidation<ResponseArray<Pagination<User>>>(
+          `/api/admin/user`,
+          {
+            method: 'GET',
+            platform: 'app', // bisa 'browser' juga kalau perlu
+            query: { page },
+          }
+        );
         this.userPages[page] = res.data;
       } catch (err: any) {
         this.error = err?.data?.message || err.message;
@@ -36,8 +43,10 @@ export const useUserStore = defineStore('userStore', {
       this.isLoading = true;
       this.error = null;
 
-       try {
-        alert('ok')
+      try {
+        const res = await $fetch<ResponseArray<Pagination<User>>>(`/api/admin/user`, {
+          method: "POST"
+        });
       } catch (err: any) {
         this.error = err?.data?.message || err.message;
       } finally {
