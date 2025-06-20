@@ -27,6 +27,7 @@ const currentData = computed(() => userStore.users(currentPage.value));
       data: currentData,
       isLoading,
       error
-    }" :currentPage="currentPage" :setPage="(page: number) => currentPage = page" :createUser="userStore.createUser" />
+    }" :currentPage="currentPage" :setPage="(page: number) => currentPage = page" :createUser="userStore.createUser"
+      :updateUser="userStore.updateUser" :deleteUser="userStore.deleteUser" />
   </ClientOnly>
 </template>

@@ -1,4 +1,4 @@
-export async function useClientFetchWithValidation<T>(
+export async function requestValidation<T>(
   url: string,
   {
     method = 'GET',
@@ -17,7 +17,7 @@ export async function useClientFetchWithValidation<T>(
   } = {}
 ): Promise<T> {
   if (process.server) {
-    throw new Error('useClientFetchWithValidation hanya bisa dipakai di client.');
+    throw new Error('requestValidation hanya bisa dipakai di client.');
   }
 
   if (!allowedPlatforms.includes(platform)) {

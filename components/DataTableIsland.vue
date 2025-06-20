@@ -5,92 +5,144 @@ import type { User } from '~/types/user';
 
 // Pastikan form key cocok dengan User
 const form = ref<Partial<User>>({
-  id: '',
-  name: '',
-  email: '',
+    id: '',
+    name: '',
+    email: '',
 });
 
 type Column = {
-  label: string;
-  key: keyof User;
+    label: string;
+    key: keyof User;
 };
 
 const props = defineProps<{
-  store: {
-    getData: (page?: number) => Promise<void>;
-    data: Pagination<User> | null;
-    isLoading: boolean;
-    error: string | null;
-  };
-  currentPage: number;
-  setPage: (page: number) => void;
-  createUser: () => void;
+    store: {
+        getData: (page?: number) => Promise<void>;
+        data: Pagination<User> | null;
+        isLoading: boolean;
+        error: Record<string, string> | any;
+    };
+    currentPage: number;
+    setPage: (page: number) => void;
+    createUser: (payload: Partial<User>) => Promise<any>;
+    updateUser: (payload: Partial<User>) => Promise<any>;
+    deleteUser: (payload: Partial<User>) => Promise<any>;
 }>();
 
 const pagesToShow = computed(() => {
-  const current = props.store.data?.meta.current_page || 1;
-  const last = props.store.data?.meta.last_page || 1;
+    const current = props.store.data?.meta.current_page || 1;
+    const last = props.store.data?.meta.last_page || 1;
 
-  const maxButtons = 5;
-  let start = Math.max(current - Math.floor(maxButtons / 2), 1);
-  let end = start + maxButtons - 1;
+    const maxButtons = 5;
+    let start = Math.max(current - Math.floor(maxButtons / 2), 1);
+    let end = start + maxButtons - 1;
 
-  if (end > last) {
-    end = last;
-    start = Math.max(end - maxButtons + 1, 1);
-  }
+    if (end > last) {
+        end = last;
+        start = Math.max(end - maxButtons + 1, 1);
+    }
 
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
 });
 
 const showModal = ref(false);
 
 const openModal = () => {
-  form.value = { id: '', name: '', email: '' };
-  showModal.value = true;
+    form.value = { id: '', name: '', email: '' };
+    showModal.value = true;
 };
 
 const closeModal = () => {
-  showModal.value = false;
+    showModal.value = false;
 };
 
-const submitForm = () => {
-  console.log('Data dikirim:', form.value);
-  props.createUser();
-  closeModal();
+const createForm = async () => {
+
+    try {
+        const users = await props.createUser(form.value);
+        if (users.code == 200) {
+            closeModal();
+        }
+    } catch (errors: any) {
+        console.error('Error Form:', errors);
+    }
+};
+
+const updateForm = async () => {
+
+    try {
+        const users = await props.updateUser(form.value);
+        if (users.code == 200) {
+            closeModal();
+        }
+    } catch (errors: any) {
+        console.error('Error Form:', errors);
+    }
+};
+
+const submitForm = async () => {
+    try {
+        if (form.value.id) {
+            // Panggil update
+            updateForm();
+        } else {
+            // Panggil create
+            createForm();
+        }
+        closeModal(); // misalnya tutup modal setelah berhasil
+    } catch (errors) {
+        props.store.error = errors; 
+    }
 };
 
 const editForm = (data: User) => {
-  form.value = { ...data };
-  showModal.value = true;
+    form.value = { ...data };
+    showModal.value = true;
 };
 
-const deleteForm = (id: number) => {
-  alert(`Hapus ID: ${id}`);
+const deleteForm = (data: User) => {
+    const konfirm = confirm(`Hapus ${data.name} ?`)
+    if (konfirm) {
+        props.deleteUser(data);
+    }
 };
 
 const columnFields = computed(() => {
-  const sample = props.store.data?.data?.[0];
-  if (!sample) return [];
-  return Object.keys(sample)
-    .filter((key) => key !== 'id')
-    .map((key) => ({ key }));
+    const sample = props.store.data?.data?.[0];
+    if (!sample) return [];
+    return Object.keys(sample)
+        .filter((key) => key !== 'id')
+        .map((key) => ({ key }));
 });
 
 const columns: Column[] = [
-  { label: 'Name', key: 'name' },
-  { label: 'Email', key: 'email' },
+    { label: 'Nama', key: 'name', },
+    { label: 'Email', key: 'email' },
 ];
 </script>
 
 <template>
     <div>
+
         <div v-if="props.store.isLoading">Memuat data...</div>
-        <div v-else-if="props.store.error">Error: {{ props.store.error }}</div>
         <div v-else-if="!props.store.data || props.store.data.data.length === 0">
+            <div class="w-10 h-10 cursor-pointer">
+                <svg @click="openModal" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50">
+                    <path
+                        d="M 25 2 C 12.309295 2 2 12.309295 2 25 C 2 37.690705 12.309295 48 25 48 C 37.690705 48 48 37.690705 48 25 C 48 12.309295 37.690705 2 25 2 z M 25 4 C 36.609824 4 46 13.390176 46 25 C 46 36.609824 36.609824 46 25 46 C 13.390176 46 4 36.609824 4 25 C 4 13.390176 13.390176 4 25 4 z M 24 13 L 24 24 L 13 24 L 13 26 L 24 26 L 24 37 L 26 37 L 26 26 L 37 26 L 37 24 L 26 24 L 26 13 L 24 13 z">
+                    </path>
+                </svg>
+            </div>
             Tidak ada data ditemukan.
         </div>
         <div v-else>
+            <template v-for="col in columns" :key="col.key">
+                <div v-if="col.key !== 'id'" class="mb-4">
+                    <span v-if="props.store.error" class="text-red-500 text-sm">
+                        {{ props.store.error.data[col.key] }}
+                    </span>
+                </div>
+            </template>
             <div class="w-10 h-10 cursor-pointer">
                 <svg @click="openModal" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50">
                     <path
@@ -123,7 +175,7 @@ const columns: Column[] = [
                                         </path>
                                     </svg>
                                 </button>
-                                <button @click="deleteForm(item.id)"
+                                <button @click="deleteForm(item)"
                                     class="text-blue-600 dark:text-blue-500 hover:underline w-8 h-8 cursor-pointer">
                                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50">
                                         <path
@@ -178,9 +230,14 @@ const columns: Column[] = [
                             <label class="block text-sm text-gray-700 dark:text-gray-300 mb-1">
                                 {{ col.label }}
                             </label>
+
                             <input v-model="form[col.key]" :type="col.key === 'email' ? 'email' : 'text'"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                                 required />
+
+                            <span v-if="props.store.error" class="text-red-500 text-sm">
+                                {{ props.store.error.data[col.key] }}
+                            </span>
                         </div>
                     </template>
 
