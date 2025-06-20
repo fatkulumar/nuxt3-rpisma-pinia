@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import { useUserStore } from '~/stores/admin/userStore';
 import { storeToRefs } from 'pinia';
-import { ref, computed, watchEffect } from 'vue';
-import DataTableIsland from '~/components/DataTableIsland.vue';
-import Skeleton from '~/components/utils/Skeleton.vue';
+import { computed, watchEffect } from 'vue';
+import Skeleton from '~/components/admin/user/Skeleton.vue';
+import UserTable from '~/components/admin/user/UserTable.vue';
 
 const userStore = useUserStore();
 const { isLoading, error } = storeToRefs(userStore);
 
-const currentPage = ref(1);
-
+// Ambil data saat mount atau currentPage berubah (otomatis diatur oleh store)
 watchEffect(() => {
-  userStore.getUsers(currentPage.value);
+  userStore.getUsers(userStore.currentPage);
 });
 
-const currentData = computed(() => userStore.users(currentPage.value));
+const currentData = computed(() => userStore.users(userStore.currentPage));
 </script>
 
 <template>
@@ -22,12 +21,10 @@ const currentData = computed(() => userStore.users(currentPage.value));
     <template #fallback>
       <Skeleton />
     </template>
-    <DataTableIsland :store="{
-      getData: userStore.getUsers,
+    <UserTable :store="{
       data: currentData,
       isLoading,
       error
-    }" :currentPage="currentPage" :setPage="(page: number) => currentPage = page" :createUser="userStore.createUser"
-      :updateUser="userStore.updateUser" :deleteUser="userStore.deleteUser" />
+    }" :userStore="userStore" />
   </ClientOnly>
 </template>
