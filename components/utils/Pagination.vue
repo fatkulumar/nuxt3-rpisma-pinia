@@ -40,6 +40,7 @@ const isLastPage = props.meta.current_page >= props.meta.last_page;
       </button>
 
       <button
+        type="button"
         :disabled="isLastPage"
         @click="props.setPage(props.meta.current_page + 1)"
         class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded hover:bg-gray-300 disabled:opacity-50"

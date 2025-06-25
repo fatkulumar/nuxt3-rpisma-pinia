@@ -22,8 +22,8 @@ const props = defineProps<{
 <template>
     <div>
 
-        <div v-if="props.userStore.isLoading">Memuat data...</div>
-        <div v-else-if="!props.store.data || props.store.data.data.length === 0">
+       <div v-show="props.userStore.isLoading">Memuat data...</div>
+        <div v-show="!props.userStore.isLoading && (!props.store.data || props.store.data.data.length === 0)">
             <div class="w-10 h-10 cursor-pointer">
                 <svg @click="props.userStore.openModal" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
                     viewBox="0 0 50 50">
@@ -34,7 +34,7 @@ const props = defineProps<{
             </div>
             Tidak ada data ditemukan.
         </div>
-        <div v-else>
+        <div>
             <template v-for="col in props.userStore.columns" :key="col.key">
                 <div v-if="col.key !== 'id'" class="mb-4">
                     <span v-if="props.store.error" class="text-red-500 text-sm">
@@ -45,7 +45,7 @@ const props = defineProps<{
             <div class="w-10 h-10 cursor-pointer">
                 <PlusIcon @click="props.userStore.openModal" />
             </div>
-            <div class="relative overflow-x-auto shadow-md">
+            <div ref="tableSection" class="relative overflow-x-auto shadow-md">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
@@ -56,8 +56,13 @@ const props = defineProps<{
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(item, index) in props.store.data.data" :key="item.id ?? index"
+                        <tr v-for="(item, index) in props.store.data?.data" :key="item.id ?? index"
                             class="odd:bg-white even:bg-gray-50 border-b dark:border-gray-700">
+                            <td class="px-6 py-4">
+                                {{
+                                    ((props.store.data?.meta?.per_page ?? 0) * ((props.store.data?.meta?.current_page ?? 1) - 1)) + index + 1
+                                }}
+                            </td>
                             <td v-for="col in props.userStore.columnFields" :key="col.key" class="px-6 py-4">
                                 {{ (item as Record<string, any>)[col.key] }}
                             </td>

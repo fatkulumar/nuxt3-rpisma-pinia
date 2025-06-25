@@ -12,20 +12,22 @@ type Column = {
 export const useUserStore = defineStore('userStore', {
   state: () => ({
     userPages: {} as Record<number, Pagination<User>>,
-    isLoading: false,
+    isLoading: false as boolean,
     error: null as Record<string, string> | any | null,
     form: ref<Partial<User>>({
       id: '',
       name: '',
       email: '',
     }),
-    showModal: ref(false),
+    showModal: false as boolean,
     columns: [
+      { label: 'Nomor', key: 'no' },
       { label: 'Nama', key: 'name' },
       { label: 'Email', key: 'email' },
+      { label: 'Password', key: 'password' },
     ] as Column[],
     currentPage: 1,
-    isEdit: false
+    isEdit: false as boolean
   }),
 
   getters: {
@@ -97,7 +99,7 @@ export const useUserStore = defineStore('userStore', {
           this.error = users;
           return responseError(users.data, users.message, users.status, users.code);
         } else {
-          this.addUserToState(users.data.data);
+          this.addUserToState(users.data);
           return responseSuccess(users, "Berhasil Menyimpan Data", true, 200);
         }
       } catch (error: any) {
@@ -128,7 +130,7 @@ export const useUserStore = defineStore('userStore', {
           this.error = res;
           return responseError(res.data, res.message, res.status, res.code);
         } else {
-          this.replaceUserInState(res.data.data); // ⬅️ update state lokal
+          this.replaceUserInState(res.data); // ⬅️ update state lokal
           return responseSuccess(res.data, "Berhasil update", true, 200);
         }
       } catch (error: any) {

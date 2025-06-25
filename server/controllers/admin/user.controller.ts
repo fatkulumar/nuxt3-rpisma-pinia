@@ -1,5 +1,5 @@
 import { H3Event } from 'h3';
-import * as UserModel from '~/server/models/user.model';
+import * as UserModel from '~/server/models/admin/user.model';
 import { responseSuccess } from '~/server/utils/response.util';
 
 export const getUsers = async (event: H3Event) => {
@@ -15,9 +15,9 @@ export const createUser = async (event: H3Event) => {
   const body = await readBody(event);
   const users = await UserModel.createUser(body);
   if(users.code != 200) {
-    return responseError(users.data, users.message, users.status, users.code );
+    return responseError(users.data, users.message, users.status, users.code);
   }else{
-    return responseSuccess(users, "Berhasil Menyimpan Data", true, 200 );
+    return responseSuccess(users.data, users.message, users.status, users.code);
   }
 };
 
@@ -27,7 +27,7 @@ export const updateUser = async (event: H3Event) => {
   if(users.code != 200) {
     return responseError(users.data, users.message, users.status, users.code );
   }else{
-    return responseSuccess(users, "Berhasil Menyimpan Data", true, 200 );
+    return responseSuccess(users.data, users.message, users.status, users.code);
   }
 };
 

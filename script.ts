@@ -8,7 +8,8 @@ async function main() {
     const index = i + 1;
     return {
       name: `User ${index}`,
-      email: `user${index}@example.com`
+      email: `user${index}@example.com`,
+      password: 'fatkulumar'
     };
   });
 

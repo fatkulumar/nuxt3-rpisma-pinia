@@ -48,13 +48,14 @@ export const getAllUsers = async (page = 1, limit = 10) => {
   }
 };
 
-type CreateUserInput = Pick<User, 'name' | 'email'>;
+type CreateUserInput = Pick<User, 'name' | 'email' | 'password'>;
 
 export const createUser = async (data: Partial<CreateUserInput>) => {
   try {
     const validate = await validateInput(data, {
       name: ['required', { min: 3 }],
       email: ['required', 'email', 'unique:users,email'],
+      password: ['required'],
     });
 
     if (validate?.code == 422) {
@@ -65,6 +66,7 @@ export const createUser = async (data: Partial<CreateUserInput>) => {
       data: {
         name: data.name!,
         email: data.email!,
+        password: data.password!,
       },
     });
 
@@ -85,6 +87,7 @@ export const updateUser = async (data: User) => {
       id: ['required'],
       name: ['required', { min: 3 }],
       email: ['required', 'email'],
+      password: ['required'],
     });
 
     if (validate?.code == 422) {
@@ -98,6 +101,7 @@ export const updateUser = async (data: User) => {
       data: {
         name: data.name!,
         email: data.email!,
+        password: data.password!,
       },
     });
 
@@ -118,6 +122,7 @@ export const deleteUser = async (data: User) => {
       id: ['required'],
       name: ['required', { min: 3 }],
       email: ['required', 'email'],
+      password: ['required'],
     });
 
     if (validate?.code == 422) {

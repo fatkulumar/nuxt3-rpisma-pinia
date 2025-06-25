@@ -17,7 +17,7 @@ const currentData = computed(() => userStore.users(userStore.currentPage));
 </script>
 
 <template>
-  <ClientOnly>
+  <ClientOnly class="w-full max-w-5xl mx-auto px-5 py-4 rounded-t shadow-xl">
     <template #fallback>
       <Skeleton />
     </template>

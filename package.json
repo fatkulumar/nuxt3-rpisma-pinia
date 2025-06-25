@@ -10,11 +10,16 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxt/icon": "^1.14.0",
     "@pinia/nuxt": "^0.11.1",
     "@prisma/client": "^6.9.0",
     "@prisma/extension-accelerate": "^2.0.1",
     "@prisma/nuxt": "^0.3.0",
+    "@sidebase/nuxt-auth": "^0.10.1",
     "@tailwindcss/vite": "^4.1.10",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "next-auth": "~4.21.1",
     "nuxt": "^3.17.5",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.10",
