@@ -10,18 +10,18 @@ export async function requestValidation<T>(
   } = {}
 ): Promise<T> {
   console.log('🧭 RequestValidation berjalan di:', process.server ? 'SERVER' : 'CLIENT')
-  // if (process.server) {
-  //   throw new Error('requestValidation hanya boleh dipakai di sisi client.')
-  // }
 
   const {
     method = 'GET',
-    platform = 'app',
-    allowedPlatforms = ['app'],
+    platform: incomingPlatform,
+    allowedPlatforms = ['app', 'browser', 'browser-dev'],
     query = {},
     body = {},
     headers = {}
   } = options
+
+  // Tentukan platform secara dinamis
+  const platform = incomingPlatform ?? (process.server ? 'app' : 'browser')
 
   // Validasi platform
   if (!allowedPlatforms.includes(platform)) {
@@ -30,12 +30,16 @@ export async function requestValidation<T>(
     )
   }
 
+  // Ambil headers server jika di SSR (misalnya cookie, auth, dsb)
+  const serverHeaders = process.server ? useRequestHeaders(['cookie', 'authorization']) : {}
+
   // Siapkan konfigurasi fetch
   const fetchOptions: any = {
     method,
     query,
     headers: {
       'client-platform': platform,
+      ...serverHeaders,
       ...headers
     }
   }
@@ -45,7 +49,12 @@ export async function requestValidation<T>(
   if (safeMethod !== 'GET' && safeMethod !== 'HEAD' && Object.keys(body).length > 0) {
     fetchOptions.body = body
   }
-  console.log(url, fetchOptions)
+
+  // Debug log
+  console.log('📡 Fetch URL:', url)
+  console.log('📦 Fetch Options:', fetchOptions)
+
+  // Jalankan request
   try {
     return await $fetch<T>(url, fetchOptions)
   } catch (error: any) {

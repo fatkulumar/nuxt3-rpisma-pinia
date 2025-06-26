@@ -1,6 +1,11 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GithubProvider from 'next-auth/providers/github'
 import { NuxtAuthHandler } from '#auth'
+import { PrismaClient, users } from "~/generated/prisma";
+import { withAccelerate } from "@prisma/extension-accelerate";
+import { validateInput } from "~/server/utils/validate";
+import bcrypt from "bcryptjs";
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 export default NuxtAuthHandler({
   // TODO: SET A STRONG SECRET, SEE https://sidebase.io/nuxt-auth/configuration/nuxt-auth-handler#secret
@@ -24,16 +29,44 @@ export default NuxtAuthHandler({
         email: { label: 'Email', type: 'text', placeholder: '(hint: fatkulumar@gmail.com)' },
         password: { label: 'Password', type: 'password', placeholder: '(hint: fatkulumar)' }
       },
-      authorize (credentials: any) {
+      async authorize (credentials: any) {
+        const validate = await validateInput(credentials, {
+          email: ['required', 'email'],
+          password: ['required'],
+        });
+
+        if (validate?.code === 422) {
+          console.warn('Validasi gagal:', validate.message)
+          return null
+        }
+
+        const checkUser = await prisma.users.findUnique({
+          where: { email: credentials.email }
+        })
+
+        if (!checkUser) {
+          console.warn('Email tidak ditemukan:', credentials.email)
+          return null
+        }
+
+        const isValid = await bcrypt.compare(credentials.password, checkUser.password!)
+
+        if (!isValid) {
+          console.warn('Password salah untuk:', credentials.email)
+          return null
+        }
+
+        // const { password: _, ...safeUser } = checkUser
+
         console.warn('ATTENTION: You should replace this with your real providers or credential provider logic! The current setup is not safe')
         // You need to provide your own logic here that takes the credentials
         // submitted and returns either a object representing a user or value
         // that is false/null if the credentials are invalid.
         // NOTE: THE BELOW LOGIC IS NOT SAFE OR PROPER FOR AUTHENTICATION!
 
-        const user = { id: '1', name: 'Fatkul Umar', email: 'fatkulumar@gmail.com', password: 'fatkulumar' }
+        const user = { id: checkUser.id, name: checkUser.name, email: checkUser.email, password: checkUser.password }
 
-        if (credentials?.email === user.email && credentials?.password === user.password) {
+        if (credentials?.email === user.email && isValid == true) {
           // Any object returned will be saved in `user` property of the JWT
           return user
         } else {

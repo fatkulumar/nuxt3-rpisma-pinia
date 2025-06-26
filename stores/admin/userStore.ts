@@ -72,7 +72,7 @@ export const useUserStore = defineStore('userStore', {
           `/api/admin/user`,
           {
             method: 'GET',
-            platform: 'app', // bisa set di composable requestValidation
+            platform: 'browser', // bisa set di composable requestValidation
             query: { page },
           }
         );
