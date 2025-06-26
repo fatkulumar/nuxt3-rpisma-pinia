@@ -17,10 +17,9 @@ export const useLoginStore = defineStore('auth', {
         async login(data: Partial<User>): Promise<void> {
             this.isLoading = true;
             try {
-                console.log(`ini adalah ${this.form.email}`)
                 const result = requestValidation('/api/login', {
                     method: "POST",
-                    platform: 'app',
+                    platform: "app",
                     body: data,
                 });
                 console.log(result);
