@@ -5,6 +5,10 @@ import { computed, watchEffect } from 'vue';
 import Skeleton from '~/components/admin/user/Skeleton.vue';
 import UserTable from '~/components/admin/user/UserTable.vue';
 
+definePageMeta({
+  middleware: 'auth'
+})
+
 const userStore = useUserStore();
 const { isLoading, error } = storeToRefs(userStore);
 

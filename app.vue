@@ -6,7 +6,7 @@ useHead({
 
 <template>
   <div class="min-h-screen h-full relative bg-gray-100 pb-20">
-    <Navbar />
+    <!-- <Navbar /> -->
     <div class="fixed bottom-0 w-full z-10">
       <AuthenticationStatus />
     </div>

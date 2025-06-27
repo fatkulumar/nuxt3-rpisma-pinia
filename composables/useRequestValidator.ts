@@ -51,8 +51,8 @@ export async function requestValidation<T>(
   }
 
   // Debug log
-  console.log('📡 Fetch URL:', url)
-  console.log('📦 Fetch Options:', fetchOptions)
+  // console.log('📡 Fetch URL:', url)
+  // console.log('📦 Fetch Options:', fetchOptions)
 
   // Jalankan request
   try {

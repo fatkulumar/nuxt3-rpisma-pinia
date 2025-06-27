@@ -1,6 +1,9 @@
 <script setup lang="ts">
     import { useRegisterStore } from '~/stores/registerStore';
     const registerStore = useRegisterStore();
+    definePageMeta({
+        middleware: 'guest'
+    });
 </script>
 
 <template>

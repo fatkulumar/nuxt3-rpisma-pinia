@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useLoginStore } from '~/stores/loginStore';
 const authStore = useLoginStore();
+
+definePageMeta({
+    middleware: 'guest'
+});
 </script>
 
 <template>
