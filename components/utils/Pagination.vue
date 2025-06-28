@@ -7,8 +7,6 @@ const props = defineProps<{
   setPage: (page: number) => void;
 }>();
 
-const isFirstPage = props.meta.current_page <= 1;
-const isLastPage = props.meta.current_page >= props.meta.last_page;
 </script>
 
 <template>
@@ -18,7 +16,7 @@ const isLastPage = props.meta.current_page >= props.meta.last_page;
     </div>
     <div class="space-x-1 flex items-center">
       <button
-        :disabled="isFirstPage"
+        :disabled="props.meta.current_page <= 1"
         @click="props.setPage(props.meta.current_page - 1)"
         class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded hover:bg-gray-300 disabled:opacity-50"
       >
@@ -41,7 +39,7 @@ const isLastPage = props.meta.current_page >= props.meta.last_page;
 
       <button
         type="button"
-        :disabled="isLastPage"
+        :disabled="props.meta.current_page >= props.meta.last_page"
         @click="props.setPage(props.meta.current_page + 1)"
         class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded hover:bg-gray-300 disabled:opacity-50"
       >

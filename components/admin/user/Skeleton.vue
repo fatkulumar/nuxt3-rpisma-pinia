@@ -1,5 +1,5 @@
 <template>
-  <div class="animate-pulse border rounded-md overflow-hidden w-full max-w-5xl mx-auto px-5 py-4 rounded-t shadow-xl">
+  <div class="animate-pulse border rounded-md overflow-hidden">
     <div class="bg-gray-200 h-10 w-full"></div>
     <table class="w-full">
       <thead>
