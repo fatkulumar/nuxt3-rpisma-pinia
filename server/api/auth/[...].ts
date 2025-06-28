@@ -46,14 +46,14 @@ export default NuxtAuthHandler({
 
         if (!checkUser) {
           console.warn('Email tidak ditemukan:', credentials.email)
-          return null
+          throw new Error(JSON.stringify({ field: 'email', message: 'Email Tidak Ditemukan' }))
         }
 
         const isValid = await bcrypt.compare(credentials.password, checkUser.password!)
 
         if (!isValid) {
           console.warn('Password salah untuk:', credentials.email)
-          return null
+          throw new Error(JSON.stringify({ field: 'password', message: 'Password salah' }))
         }
 
         // const { password: _, ...safeUser } = checkUser

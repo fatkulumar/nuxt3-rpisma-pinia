@@ -32,11 +32,17 @@ export const useLoginStore = defineStore('auth', {
         async loginForm(): Promise<void> {
             try {
                 const { signIn } = useAuth()
-                const res = await signIn('credentials', {
+                const result = await signIn('credentials', {
                     redirect: false,
                     email: this.form.email,
                     password: this.form.password
                 })
+                if(result?.error == null) {
+                    navigateTo('/');
+                }else{
+                    const error = JSON.parse(result.error)
+                    this.error = error
+                }
             } catch (error) {
                 console.error(error);
             }
