@@ -14,10 +14,10 @@ const { isLoading, error } = storeToRefs(userStore);
 
 // Ambil data saat mount atau currentPage berubah (otomatis diatur oleh store)
 watchEffect(() => {
-  userStore.getUsers(userStore.currentPage);
+   userStore.getUsers(userStore.currentPage, userStore.keyWordSearch);
 });
 
-const currentData = computed(() => userStore.users(userStore.currentPage));
+const currentData = computed(() =>  userStore.usersWithSearch(userStore.currentPage, userStore.keyWordSearch));
 </script>
 
 <template>

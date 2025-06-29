@@ -11,7 +11,7 @@ type Column = {
 
 export const useUserStore = defineStore('userStore', {
   state: () => ({
-    userPages: {} as Record<number, Pagination<User>>,
+    userPages: {} as Record<string, Pagination<User>>,
     isLoading: false as boolean,
     error: null as Record<string, string> | any | null,
     form: ref<Partial<User>>({
@@ -27,13 +27,11 @@ export const useUserStore = defineStore('userStore', {
       { label: 'Password', key: 'password' },
     ] as Column[],
     currentPage: 1,
-    isEdit: false as boolean
+    isEdit: false as boolean,
+    keyWordSearch: '' as string
   }),
 
   getters: {
-    users: (state) => (page: number): Pagination<User> | null =>
-      state.userPages[page] ?? null,
-
     columnFields: (state) => {
       const firstPage = Object.values(state.userPages)[0]; // ambil halaman pertama
       const sample = firstPage?.data?.[0];
@@ -43,9 +41,12 @@ export const useUserStore = defineStore('userStore', {
         .map((key) => ({ key }));
     },
 
-     pagesToShow(state): number[] {
+    pagesToShow(state): number[] {
+      const key = `${state.currentPage}_${state.keyWordSearch.trim().toLowerCase()}`;
+      const meta = state.userPages[key]?.meta;
+
+      const last = meta?.last_page ?? 1;
       const current = state.currentPage;
-      const last = state.userPages[current]?.meta.last_page ?? 1;
 
       const maxButtons = 5;
       let start = Math.max(current - Math.floor(maxButtons / 2), 1);
@@ -57,12 +58,20 @@ export const useUserStore = defineStore('userStore', {
       }
 
       return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-    }
+    },
+
+    usersWithSearch: (state) => (page: number, search: string): Pagination<User> | null => {
+      const key = `${page}_${search.trim().toLowerCase()}`;
+      return state.userPages[key] ?? null;
+    },
   },
 
   actions: {
-    async getUsers(page = 1): Promise<void> {
-      if (this.userPages[page]) return; // gunakan cache kalau ada
+    async getUsers(page = 1, search = '') {
+      const key = `${page}_${search.trim().toLowerCase()}`;
+
+      // Jangan ulangi fetch jika cache sudah ada, bahkan kalau data kosong
+      if (key in this.userPages) return;
 
       this.isLoading = true;
       this.error = null;
@@ -72,12 +81,15 @@ export const useUserStore = defineStore('userStore', {
           `/api/admin/user`,
           {
             method: 'GET',
-            platform: 'browser', // bisa set di composable requestValidation
-            query: { page },
+            platform: 'browser',
+            query: { page, search },
           }
         );
-        this.userPages[page] = res.data;
+
+        // Tetap simpan meskipun data kosong
+        this.userPages[key] = res.data;
         this.currentPage = page;
+        this.keyWordSearch = search;
       } catch (err: any) {
         this.error = err?.data?.message || err.message;
       } finally {
@@ -164,7 +176,7 @@ export const useUserStore = defineStore('userStore', {
         if (error?.response?.status === 422) {
           const fieldErrors = error.response._data.errors;
           console.log('Field validation error:', fieldErrors);
-          throw fieldErrors; 
+          throw fieldErrors;
         } else {
           throw error;
         }
@@ -271,6 +283,10 @@ export const useUserStore = defineStore('userStore', {
         this.currentPage = page;
         this.getUsers(page);
       }
+    },
+
+    async onSearch(): Promise<void> {
+      this.getUsers(1, this.keyWordSearch);
     }
   },
 });

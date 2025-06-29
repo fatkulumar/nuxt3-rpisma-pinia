@@ -9,7 +9,7 @@ export async function requestValidation<T>(
     headers?: Record<string, string>
   } = {}
 ): Promise<T> {
-  console.log('🧭 RequestValidation berjalan di:', process.server ? 'SERVER' : 'CLIENT')
+  // console.log('🧭 RequestValidation berjalan di:', process.server ? 'SERVER' : 'CLIENT')
 
   const {
     method = 'GET',

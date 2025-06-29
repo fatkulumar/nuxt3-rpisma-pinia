@@ -4,14 +4,25 @@ import { User } from '~/types/user';
 import { validateInput } from '~/server/utils/validate';
 const prisma = new PrismaClient().$extends(withAccelerate());
 
-export const getAllUsers = async (page = 1, limit = 10) => {
+export const getAllUsers = async (page = 1, limit = 10, search = '') => {
   try {
     const [data, total] = await Promise.all([
       prisma.users.findMany({
+        where: {
+          email: {
+            contains: search,
+          },
+        },
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.users.count(),
+      prisma.users.count({
+        where: {
+          email: {
+            contains: search,
+          },
+        },
+      }),
     ]);
 
     const lastPage = Math.ceil(total / limit);
